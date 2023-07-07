@@ -1,7 +1,9 @@
 import pandas as pd
 from flask import *
-import os, csv
+import os
 from werkzeug.utils import secure_filename
+
+from helpers.functions import reading_csv, reading_dict, total_balance, transactions_for_month, average_amount
 
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 
@@ -15,28 +17,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.secret_key = 'This is your secret key to utilize session in Flask'
 
-def reading_csv(data_file_path):
-    with open(data_file_path, 'r') as file:
-        diccionary_aux = {}
-        count = 0
-  
-        reader = csv.reader(file, skipinitialspace=True)
-        for row in reader:
-            if count == 0:
-                for col in row:
-                    diccionary_aux[col] = []
-					# print(col)
-                count = count + 1
-                return diccionary_aux
-
-def reading_dict(data_file_path, general_dict):
-    with open(data_file_path, 'r') as file:
-        reader = csv.DictReader(file, skipinitialspace=True)
-        for row in reader:
-            for llave in row:
-                general_dict[llave].append(row[llave])
-    return general_dict
-
+        
 @app.route('/', methods=['GET', 'POST'])
 def uploadFile():
 	if request.method == 'POST':
@@ -49,12 +30,10 @@ def uploadFile():
 		else:
 			# Extracting uploaded file name
 			data_filename = secure_filename(archive.filename)
-
 			archive.save(os.path.join(app.config['UPLOAD_FOLDER'],data_filename))
-
 			session['uploaded_data_file_path'] = os.path.join(app.config['UPLOAD_FOLDER'], data_filename)
-
 			return render_template('index2.html')
+
 	return render_template("index.html")
 
 
@@ -63,13 +42,20 @@ def showData():
 	# Uploaded File Path
     data_file_path = session.get('uploaded_data_file_path', None)
     
-    general_dict = reading_csv(data_file_path)
-    inserting_dict = reading_dict(data_file_path, general_dict)
+    # Obtaining general dict from csv
+    keys_dict = reading_csv(data_file_path)
+    csv_to_dict = reading_dict(data_file_path, keys_dict)
+
+    # Balance
+    total_balance(csv_to_dict)
+            
+    # Transactions
+    transactions_for_month(csv_to_dict)
     
-    print(inserting_dict)
-
-
-    return make_response(jsonify({'message': inserting_dict}), 200)
+    # Average
+    average_amount(csv_to_dict)
+    
+    return make_response(jsonify({'message': csv_to_dict}), 200)
 
 if __name__ == '__main__':
 	app.run(debug=True)
