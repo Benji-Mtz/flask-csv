@@ -1,5 +1,6 @@
-import psycopg2
-import os, csv
+
+from email.message import EmailMessage
+import smtplib, csv
 
 calendar = {
     '1': "Januray",
@@ -80,3 +81,55 @@ def average_amount(general_dict):
             return debit, credit
         else:
             pass
+        
+def send_email(data, sender_email,  receiver_email, token):
+    msg = EmailMessage()
+    msg['Subject'] = 'Reporte de transaciones'
+    msg['From'] = sender_email 
+    msg['To'] = receiver_email
+
+    concat_transactions = ''
+    counter = 1
+    
+    for tx in data['transactions']:
+        if counter == len(data['transactions']):
+            concat_transactions += f"<li>Number of transactions in { tx }: <b>{data['transactions'][tx]}</b></li>"
+        else:
+            concat_transactions += f"<li>Number of transactions in { tx }: <b>{data['transactions'][tx]}</b></li>" + "\n"
+            counter = counter + 1
+
+
+
+    msg.set_content(f'''
+    <!DOCTYPE html>
+    <html>
+        <body>
+            <div style="background-color:#DAF7A6;padding:10px 20px;">
+                <h1 style="font-family:Georgia, 'Times New Roman', Times, serif; color:#0572b0; text-align:center;">Stori Report</h1>
+            </div>
+            <br />
+            <div style="padding:20px 0px">
+                <div style="height: 500px;width:400px">
+                    <img src="https://blog.storicard.com/wp-content/uploads/2019/07/Stori-horizontal-11.jpg" style="height: 300px; text-align:center;">
+                    <div style="text-align:justify;">
+                        <h2>This was the behavior of your account.</h2>
+                        <p style="font-size: 1.5em;">
+                            <ul>
+                                <li>Total balance is:&nbsp;<b>{ data['total_balance'] }</b></li>
+                                {concat_transactions}
+                                <li>Average debit amount:&nbsp;<b>{ data['avg_debit'] }</b></li>
+                                <li>Average credit amount:&nbsp;<b>{ data['avg_credit'] }</b></li>
+                            </ul>
+                        </p>
+                        <a href="#">Leer más</a>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </html>
+    ''', subtype='html')
+
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(sender_email, token) 
+        smtp.send_message(msg)

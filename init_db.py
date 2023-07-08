@@ -1,13 +1,16 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import os, sys
 import psycopg2
 import logging
 
 def get_db_connection():
     conn = psycopg2.connect(
-        host="localhost",
-        database="edteam_db",
-        user="root",
-        password="root")
+        host = os.environ['POSTGRES_HOST'],
+        database = os.environ['POSTGRES_DB'],
+        user = os.environ['POSTGRES_USER'],
+        password = os.environ['POSTGRES_PASSWORD'])
     return conn
 
 logger = logging.getLogger()
@@ -21,8 +24,8 @@ def create_table():
         cur = conn.cursor()
 
         # Execute a command: this creates a new table
-        cur.execute('DROP TABLE IF EXISTS transactions;')
-        cur.execute('CREATE TABLE transactions (id serial PRIMARY KEY,'
+        # cur.execute('DROP TABLE IF EXISTS transactions;')
+        cur.execute('CREATE TABLE IF NOT EXISTS transactions (id serial PRIMARY KEY,'
                     'id_client integer NULL,'
                     't_balance float NOT NULL,'
                     'tx_for_month JSONB NULL,'

@@ -6,11 +6,14 @@
 <body> 
     <form method = "POST" enctype="multipart/form-data" action = "/">   
         <input type="file" name="file" accept=".csv">
-        <input type = "submit" value="Subir"> 
+        <br>
+        <input type="email" name="email" id="email" placeholder="email (opcional)">
+        <br><br>
+        <input type = "submit" value="Subir archivo"> 
     </form>
     <p style="color:blue;">Escoge un archivo csv, porfavor.</p>
-  <form action="/show_data" target="_blank">
+    <!-- <form action="/show_data" target="_blank">
         <input type="submit" value="Ver data por GET"/>
-    </form>
+    </form> -->
 </body> 
 </html>
