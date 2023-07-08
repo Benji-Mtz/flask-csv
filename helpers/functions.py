@@ -1,4 +1,5 @@
-import csv
+import psycopg2
+import os, csv
 
 calendar = {
     '1': "Januray",
@@ -43,7 +44,7 @@ def total_balance(general_dict):
     for llave in general_dict:
         if 'Transaction' in llave:
             tb = sum([ float(value) for value in general_dict[llave]])
-            print(tb)
+            return tb
         else:
             pass
     
@@ -67,7 +68,7 @@ def transactions_for_month(general_dict):
         else:
             register_dates[month_str] = default_day
             
-    print(register_dates)
+    return register_dates
 
 def average_amount(general_dict):
     for llave in general_dict:
@@ -76,6 +77,6 @@ def average_amount(general_dict):
             debit = sum([ negative for negative in liststr_to_float if negative < 0]) / 2
             credit = sum([ positive for positive in liststr_to_float if positive >= 0 ]) / 2
             
-            print(debit, credit)
+            return debit, credit
         else:
             pass
