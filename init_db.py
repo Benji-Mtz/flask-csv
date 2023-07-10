@@ -7,7 +7,7 @@ import logging
 
 def get_db_connection():
     conn = psycopg2.connect(
-        host = os.environ['POSTGRES_HOST'],
+        host = "flask_db",
         database = os.environ['POSTGRES_DB'],
         user = os.environ['POSTGRES_USER'],
         password = os.environ['POSTGRES_PASSWORD'])
@@ -18,6 +18,7 @@ logger.setLevel(logging.INFO)
 
 def create_table():
     cur = ''
+    conn = ''
     try:
         # Open a cursor to perform database operations
         conn = get_db_connection()

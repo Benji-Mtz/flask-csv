@@ -76,7 +76,6 @@ def showData():
     
     id_cliente = random.randint(1,1000)
     
-    '''
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -98,7 +97,7 @@ def showData():
             cursor.close()
             conn.close()
             print("PostgreSQL connection is closed")
-    '''
+    
     # Sending email
     data_for_email = {
         "total_balance": tb,
